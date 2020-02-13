@@ -13,3 +13,5 @@ I have created this public repo as I could not find any up to date information o
 
 I have made this public so other developers can use it as a boilerplate for thier clients who require specific shipping requirements. 
 
+*Notes:*
+[Extending: wc shipping method](https://github.com/woocommerce/woocommerce/wiki/Shipping-Method-API#extending-wc_shipping_method
