@@ -121,8 +121,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
             'id' => $this->id,
             'label'   => $instance_settings['title'],
             'cost'    => $instance_settings['cost'],
-            'package' => $package,
-            'taxes'   => false,
+            'taxes'   => 'per_order'
           );
 
           $this->add_rate($rate);
