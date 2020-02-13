@@ -1,6 +1,6 @@
 # A Wordpress WooCommerce Custom Shipping Plugin Starting Point
 
-_Status: Under Development_
+_Status: Under Development USE AT YOUR OWN RISK_
 
 for:
 

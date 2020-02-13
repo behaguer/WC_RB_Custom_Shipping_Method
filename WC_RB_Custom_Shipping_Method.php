@@ -29,12 +29,20 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
           $this->supports = array(
             'shipping-zones',
             'instance-settings',
+            'instance-settings-modal',
           );
 
           $this->init();
 
-          $this->enabled = isset($this->settings['enabled']) ? $this->settings['enabled'] : 'yes';
+          // This doesn't seem to be used any more.
+          //$this->enabled = isset($this->settings['enabled']) ? $this->settings['enabled'] : 'yes';
+
+          // TODO: This is not working. Will always show the default but will save the setting set in instance_form_fields
           $this->title = isset($this->settings['title']) ? $this->settings['title'] : __('Custom Shipping for Zones', 'rb_custom_shipping');
+
+          // Try to fix
+          $instance_settings =  $this->instance_settings;
+          $this->title = isset($instance_settings['title']) ? $instance_settings['title'] : __('Custom Shipping for Zones', 'rb_custom_shipping');
 
         }
 
@@ -42,35 +50,45 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
         {
           $this->init_form_fields();
           $this->init_settings();
+
           add_action('woocommerce_update_options_shipping_' . $this->id, array($this, 'process_admin_options'));
         }
 
         function init_form_fields()
         {
-          $this->form_fields = array(
-            'enabled' => array(
-              'title' => __('Enable', 'rb_custom_shipping'),
-              'type' => 'checkbox',
-              'default' => 'yes',
-            ),
-            'weight' => array(
-              'title' => __('Weight (kg)', 'rb_custom_shipping'),
-              'type' => 'number',
-              'default' => 50,
-            ),
+          $this->instance_form_fields = array(
+            // No longer used
+            // 'enabled' => array(
+            //   'title' => __('Enable', 'rb_custom_shipping'),
+            //   'type' => 'checkbox',
+            //   'default' => 'yes',
+            // ),
             'title' => array(
               'title' => __('Title', 'rb_custom_shipping'),
               'type' => 'text',
               'default' => __('Custom Zone Shipping', 'rb_custom_shipping'),
             ),
+            'cost' => array(
+              'title' => __('Cost', 'rb_custom_shipping'),
+              'type' => 'number',
+              'description' => __( 'Cost of shipping', 'teame' ),
+              'default' => 4
+            ),
+            'weight' => array(
+              'title' => __('Weight (kg)', 'rb_custom_shipping'),
+              'type' => 'number',
+              'description' => __( 'Maximum Weight Limit', 'rb_custom_shipping' ),
+              'default' => 50,
+            ),
+
           );
         }
 
         public function rrus_shipping_calculator($package)
         {
+          $instance_settings =  $this->instance_settings;
+
           $weight = 0;
-          $cost = 0;
-          $country = $package["destination"]["country"];
 
           foreach ($package['contents'] as $item_id => $values) {
             $_product = $values['data'];
@@ -78,6 +96,8 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
           }
 
           $weight = wc_get_weight($weight, 'kg');
+          $country = $package["destination"]["country"];
+          $cost = 0;
 
           if ($weight <= 5) {
             $cost = 0;
@@ -106,8 +126,10 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 
           $rate = array(
             'id' => $this->id,
-            'label' => $this->title,
-            'cost' => $cost,
+            'label'   => $instance_settings['title'],
+            'cost'    => $instance_settings['cost'],
+            'package' => $package,
+            'taxes'   => false,
           );
 
           $this->add_rate($rate);
@@ -117,6 +139,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
     }
   }
 
+  // Add to the list of Woocommerce Shipping Methods
   add_action('woocommerce_shipping_init', 'rb_custom_shipping_method_init');
 
   function add_rb_custom_shipping_method($methods)
