@@ -25,7 +25,6 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
           $this->id = 'rb_custom_shipping_method';
           $this->instance_id = absint($instance_id);
           $this->method_title = __('Custom Shipping Method for Zones', 'rb_custom_shipping');
-          $this->title = isset($this->settings['title']) ? $this->settings['title'] : __('Custom Shipping for Zones', 'rb_custom_shipping');
           $this->method_description = __('A Custom Shipping Method configurable for individual zones', 'rb_custom_shipping');
           $this->supports = array(
             'shipping-zones',
@@ -33,6 +32,8 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
             'instance-settings-modal',
           );
 
+          $this->title = isset($this->settings['title']) ? $this->settings['title'] : __('Custom Shipping for Zones', 'rb_custom_shipping');
+        
           $this->init();
 
         }
@@ -75,7 +76,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
           );
         }
 
-        public function calculate_shipping($package)
+        public function calculate_shipping( $package = array() )
         {
           $instance_settings =  $this->instance_settings;
 
