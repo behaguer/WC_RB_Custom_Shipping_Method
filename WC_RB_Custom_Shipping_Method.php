@@ -32,6 +32,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
             'instance-settings-modal',
           );
 
+          
           $this->title = isset($this->settings['title']) ? $this->settings['title'] : __('Custom Shipping for Zones', 'rb_custom_shipping');
         
           $this->init();
@@ -42,6 +43,9 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
         {
           $this->init_form_fields();
           $this->init_settings();
+
+          $this->enabled = $this->get_option( 'enabled' );
+          $this->title = $this->get_option( 'title' ); 
 
           add_action('woocommerce_update_options_shipping_' . $this->id, array($this, 'process_admin_options'));
         }
