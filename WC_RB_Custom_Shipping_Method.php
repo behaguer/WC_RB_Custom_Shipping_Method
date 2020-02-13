@@ -70,12 +70,12 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
               'type' => 'number',
               'description' => __( 'Maximum Weight Limit', 'rb_custom_shipping' ),
               'default' => 50,
-            ),
+            )
 
           );
         }
 
-        public function rrus_shipping_calculator($package)
+        public function calculate_shipping($package)
         {
           $instance_settings =  $this->instance_settings;
 
