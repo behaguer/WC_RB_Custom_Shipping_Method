@@ -24,8 +24,9 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
         {
           $this->id = 'rb_custom_shipping_method';
           $this->instance_id = absint($instance_id);
-          $this->method_title = __('Custom Shipping', 'rb_custom_shipping');
-          $this->method_description = __('Custom Shipping Method for Zones', 'rb_custom_shipping');
+          $this->method_title = __('Custom Shipping Method for Zones', 'rb_custom_shipping');
+          $this->title = isset($this->settings['title']) ? $this->settings['title'] : __('Custom Shipping for Zones', 'rb_custom_shipping');
+          $this->method_description = __('A Custom Shipping Method configurable for individual zones', 'rb_custom_shipping');
           $this->supports = array(
             'shipping-zones',
             'instance-settings',
@@ -33,16 +34,6 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
           );
 
           $this->init();
-
-          // This doesn't seem to be used any more.
-          //$this->enabled = isset($this->settings['enabled']) ? $this->settings['enabled'] : 'yes';
-
-          // TODO: This is not working. Will always show the default but will save the setting set in instance_form_fields
-          $this->title = isset($this->settings['title']) ? $this->settings['title'] : __('Custom Shipping for Zones', 'rb_custom_shipping');
-
-          // Try to fix
-          $instance_settings =  $this->instance_settings;
-          $this->title = isset($instance_settings['title']) ? $instance_settings['title'] : __('Custom Shipping for Zones', 'rb_custom_shipping');
 
         }
 
@@ -57,21 +48,21 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
         function init_form_fields()
         {
           $this->instance_form_fields = array(
-            // No longer used
-            // 'enabled' => array(
-            //   'title' => __('Enable', 'rb_custom_shipping'),
-            //   'type' => 'checkbox',
-            //   'default' => 'yes',
-            // ),
+            'enabled' => array(
+              'title' => __('Enable', 'rb_custom_shipping'),
+              'type' => 'checkbox',
+              'default' => 'yes',
+            ),
             'title' => array(
               'title' => __('Title', 'rb_custom_shipping'),
               'type' => 'text',
               'default' => __('Custom Zone Shipping', 'rb_custom_shipping'),
+              'description' => __( 'Visible on the front end.', 'rb_custom_shipping' ),
             ),
             'cost' => array(
               'title' => __('Cost', 'rb_custom_shipping'),
               'type' => 'number',
-              'description' => __( 'Cost of shipping', 'teame' ),
+              'description' => __( 'Cost of shipping', 'rb_custom_shipping' ),
               'default' => 4
             ),
             'weight' => array(
@@ -110,6 +101,7 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
           }
 
           $countryZones = array(
+            'AU' => 1,
             'ES' => 2,
             'GB' => 2,
             'US' => 3,
