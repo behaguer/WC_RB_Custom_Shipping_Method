@@ -120,15 +120,16 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
     }
   }
 
-  // Add to the list of Woocommerce Shipping Methods
+  // Init the shipping method
   add_action('woocommerce_shipping_init', 'rb_custom_shipping_method_init');
+
+  // Add to the list of Woocommerce Shipping Methods
+  add_filter('woocommerce_shipping_methods', 'add_rb_custom_shipping_method');
 
   function add_rb_custom_shipping_method($methods)
   {
     $methods['rb_custom_shipping_method'] = 'WC_RB_Custom_Shipping_Method';
     return $methods;
   }
-
-  add_filter('woocommerce_shipping_methods', 'add_rb_custom_shipping_method');
 
 }
