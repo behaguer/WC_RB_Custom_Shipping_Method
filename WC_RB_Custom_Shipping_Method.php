@@ -82,49 +82,10 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 
         public function calculate_shipping( $package = array() )
         {
-          $instance_settings =  $this->instance_settings;
-
-          $weight = 0;
-
-          foreach ($package['contents'] as $item_id => $values) {
-            $_product = $values['data'];
-            $weight = $weight + $_product->get_weight() * $values['quantity'];
-          }
-
-          $weight = wc_get_weight($weight, 'kg');
-          $country = $package["destination"]["country"];
-          $cost = 0;
-
-          if ($weight <= 5) {
-            $cost = 0;
-          } elseif ($weight <= 25) {
-            $cost = 5;
-          } elseif ($weight <= 45) {
-            $cost = 10;
-          } else {
-            $cost = 15;
-          }
-
-          $countryZones = array(
-            'AU' => 1,
-            'ES' => 2,
-            'GB' => 2,
-            'US' => 3,
-          );
-
-          $zonePrices = array(
-            2 => 50,
-            3 => 70,
-          );
-
-          $zoneFromCountry = $countryZones[$country];
-          $priceFromZone = $zonePrices[$zoneFromCountry];
-          $cost += $priceFromZone;
 
           $rate = array(
-            'id' => $this->id,
-            'label'   => $instance_settings['title'],
-            'cost'    => $instance_settings['cost'],
+            'label'   => $this->get_option( 'title' ),
+            'cost'    => $this->get_option( 'cost' ),
             'taxes'   => 'per_order'
           );
 
@@ -146,43 +107,4 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 
   add_filter('woocommerce_shipping_methods', 'add_rb_custom_shipping_method');
 
-  function rb_custom_validate_order($posted)
-  {
-    $packages = WC()->shipping->get_packages();
-    $chosen_methods = WC()->session->get('chosen_shipping_methods');
-
-    if (is_array($chosen_methods) && in_array('rb_custom_shipping', $chosen_methods)) {
-      foreach ($packages as $i => $package) {
-
-        if ($chosen_methods[$i] != "rb_custom_shipping_method") {
-          continue;
-        }
-
-        $WC_RB_Custom_Shipping_Method = new WC_RB_Custom_Shipping_Method();
-        $weightLimit = (int) $WC_RB_Custom_Shipping_Method->settings['weight'];
-        $weight = 0;
-
-        foreach ($package['contents'] as $item_id => $values) {
-          $_product = $values['data'];
-          $weight = $weight + $_product->get_weight() * $values['quantity'];
-        }
-
-        $weight = wc_get_weight($weight, 'kg');
-
-        if ($weight > $weightLimit) {
-          $message = sprintf(__('OOPS, %d kg increase the maximum weight of %d kg for %s', 'rb_custom_shipping'), $weight, $weightLimit, $WC_RB_Custom_Shipping_Method->title);
-          $messageType = "error";
-
-          if (!wc_has_notice($message, $messageType)) {
-            wc_add_notice($message, $messageType);
-          }
-
-        }
-
-      }
-    }
-  }
-
-  add_action('woocommerce_review_order_before_cart_contents', 'rb_custom_validate_order', 10);
-  add_action('woocommerce_after_checkout_validation', 'rb_custom_validate_order', 10);
 }
