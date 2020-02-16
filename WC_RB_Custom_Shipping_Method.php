@@ -70,8 +70,14 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
               'description' => __( 'Cost of shipping', 'rb_custom_shipping' ),
               'default' => 4
             ),
-            'weight' => array(
-              'title' => __('Weight (kg)', 'rb_custom_shipping'),
+            'minweight' => array(
+              'title' => __('Min Weight (kg)', 'rb_custom_shipping'),
+              'type' => 'number',
+              'description' => __( 'Minimum Weight Limit', 'rb_custom_shipping' ),
+              'default' => 50,
+            ),
+            'maxweight' => array(
+              'title' => __('Max Weight (kg)', 'rb_custom_shipping'),
               'type' => 'number',
               'description' => __( 'Maximum Weight Limit', 'rb_custom_shipping' ),
               'default' => 50,
@@ -82,15 +88,33 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 
         public function calculate_shipping( $package = array() )
         {
+          $instance_settings =  $this->instance_settings;
+          
+          $minweight = $instance_settings['minweight'];
+          $maxweight = $instance_settings['maxweight'];
 
-          $rate = array(
-            'label'   => $this->get_option( 'title' ),
-            'cost'    => $this->get_option( 'cost' ),
-            'taxes'   => 'per_order'
-          );
+          $weight = 0;
 
-          $this->add_rate($rate);
+          $country = $package["destination"]["country"]; // example get package info
 
+          foreach ($package['contents'] as $item_id => $values) {
+            $_product = $values['data'];
+            $weight = $weight + $_product->get_weight() * $values['quantity'];
+          }
+
+          $weight = wc_get_weight($weight, 'kg');
+
+          if ($weight >= $minweight && $weight <= $maxweight) {
+
+            $rate = array(
+              'label'   => $this->get_option( 'title' ),
+              'cost'    => $this->get_option( 'cost' ),
+              'taxes'   => 'per_order'
+            );
+  
+            $this->add_rate($rate);
+
+          }
         }
       }
     }
